@@ -27,7 +27,7 @@ async function registerCommands() {
   console.log(`Registered ${body.length} slash commands (${devGuildId ? `guild ${devGuildId}` : "global"}).`);
 }
 
-client.once("ready", async () => {
+client.once("clientReady", async () => {
   console.log(`Logged in as ${client.user?.tag}`);
   try {
     await registerCommands();

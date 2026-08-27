@@ -22,7 +22,7 @@ const command: Command = {
     }
 
     if (user.hp <= 0) {
-      await interaction.reply({ content: "❌ HP của bạn đã cạn. Dùng `/use item:health_potion` hoặc chờ hồi phục.", ephemeral: true });
+      await interaction.reply({ content: "❌ HP của bạn đã cạn. Mua Health Potion ở `/shop` rồi dùng `/use item:health_potion` để hồi phục.", ephemeral: true });
       return;
     }
 
@@ -67,7 +67,7 @@ const command: Command = {
     } else {
       await prisma.user.update({
         where: { id: user.id },
-        data: { hp: Math.max(1, newHp), lastBoss: new Date() },
+        data: { hp: Math.max(0, newHp), lastBoss: new Date() },
       });
 
       embed = baseEmbed(`💀 Thua trận trước ${boss.emoji} ${boss.name}`, COLORS.danger).setDescription(
