@@ -3,7 +3,7 @@ import { Command } from "./types";
 import { getOrCreateUser, getTotalStats } from "../lib/user";
 import { prisma } from "../lib/prisma";
 import { COOLDOWNS, formatDuration, remainingCooldown } from "../lib/cooldown";
-import { pickMonster, BOSSES } from "../data/monsters";
+import { rollBoss } from "../data/monsters";
 import { simulateCombat, randomInRange } from "../lib/combat";
 import { applyXpGain } from "../lib/xp";
 import { baseEmbed, COLORS } from "../lib/embeds";
@@ -27,7 +27,7 @@ const command: Command = {
     }
 
     const { powerBonus, defenseBonus, hpBonus } = await getTotalStats(user.id);
-    const boss = pickMonster(BOSSES, user.level);
+    const boss = rollBoss(user.level);
 
     const result = simulateCombat(
       { power: user.power + powerBonus, defense: user.defense + defenseBonus, hp: user.hp },
