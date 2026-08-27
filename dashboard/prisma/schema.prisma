@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  discordId     String
+  guildId       String
+  username      String
+  classId       String?
+
+  level         Int      @default(1)
+  xp            Int      @default(0)
+  coin          Int      @default(200)
+
+  power         Int      @default(10)
+  defense       Int      @default(10)
+  maxHp         Int      @default(100)
+  hp            Int      @default(100)
+
+  dailyStreak   Int      @default(0)
+  questStreak   Int      @default(0)
+  lastDaily     DateTime?
+  lastWork      DateTime?
+  lastBoss      DateTime?
+  lastRaid      DateTime?
+  lastDuel      DateTime?
+  lastMessageXp DateTime?
+  lastVoiceXp   DateTime?
+
+  clanId        String?
+  clan          Clan?    @relation(fields: [clanId], references: [id])
+
+  inventory     InventoryItem[]
+  pets          Pet[]
+  achievements  UserAchievement[]
+  quest         QuestProgress?
+
+  createdAt     DateTime @default(now())
+
+  @@unique([discordId, guildId])
+  @@index([guildId])
+  @@index([clanId])
+}
+
+model InventoryItem {
+  id       String  @id @default(cuid())
+  userId   String
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId   String
+  quantity Int     @default(1)
+  equipped Boolean @default(false)
+
+  @@unique([userId, itemId])
+}
+
+model Pet {
+  id        String   @id @default(cuid())
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  species   String
+  name      String
+  level     Int      @default(1)
+  xp        Int      @default(0)
+  power     Int      @default(5)
+  hunger    Int      @default(100)
+  happiness Int      @default(100)
+  energy    Int      @default(100)
+  rarity    String
+  createdAt DateTime @default(now())
+
+  @@index([ownerId])
+}
+
+model Clan {
+  id        String   @id @default(cuid())
+  guildId   String
+  name      String
+  leaderId  String
+  level     Int      @default(1)
+  xp        Int      @default(0)
+  bank      Int      @default(0)
+  createdAt DateTime @default(now())
+  members   User[]
+
+  @@unique([guildId, name])
+  @@index([guildId])
+}
+
+model UserAchievement {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementKey String
+  unlockedAt     DateTime @default(now())
+
+  @@unique([userId, achievementKey])
+}
+
+model QuestProgress {
+  id           String  @id @default(cuid())
+  userId       String  @unique
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date         String
+  messages     Int     @default(0)
+  voiceMinutes Int     @default(0)
+  minigames    Int     @default(0)
+  claimed      Boolean @default(false)
+}

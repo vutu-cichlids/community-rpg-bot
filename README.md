@@ -83,7 +83,34 @@ Dùng `/help` trong Discord để xem đầy đủ, tóm tắt:
 
 XP cũng tự động cộng khi chat (cooldown 1 phút/lần) và khi ở trong voice channel (mỗi 5 phút).
 
+## 6. Dashboard (tùy chọn)
+
+Thư mục [`dashboard/`](dashboard) là một web app Next.js riêng, đọc trực tiếp cùng database
+Postgres của bot: trang công khai hiển thị thống kê server + leaderboard live, và khu `/admin`
+(gate bằng mật khẩu) để tra cứu và chỉnh sửa dữ liệu người chơi.
+
+### Deploy lên Railway (cùng project với bot)
+
+1. Trong project Railway hiện tại → **New → GitHub Repo** → chọn lại cùng repo
+   `community-rpg-bot`.
+2. Vào service mới tạo → **Settings → Source → Add Root Directory** → nhập `dashboard`.
+3. Vào tab **Variables** của service này, thêm:
+
+   | Key | Value |
+   |---|---|
+   | `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` (cùng Postgres đang dùng cho bot) |
+   | `ADMIN_PASSWORD` | mật khẩu bạn tự chọn để đăng nhập `/admin` |
+
+4. Railway build (`npm install` → `prisma generate` → `next build`) rồi start (`next start`).
+5. Vào **Settings → Networking → Generate Domain** để có URL public cho service này.
+
+Trang chủ (`/`) công khai cho mọi người có link. Khu `/admin` yêu cầu nhập đúng
+`ADMIN_PASSWORD` mới xem/sửa được — không dùng chung mật khẩu với tài khoản khác, và đổi
+định kỳ nếu nghi ngờ bị lộ.
+
 ## Ghi chú bảo mật
 
 - Không bao giờ commit `.env` hay bot token vào git (`.gitignore` đã loại trừ `.env`).
 - Nếu lộ token, vào Developer Portal → Bot → Reset Token ngay lập tức.
+- `ADMIN_PASSWORD` của dashboard cũng là bí mật — chỉ nhập trực tiếp vào ô Variables trên
+  Railway, không dán vào chat hay commit vào git.
